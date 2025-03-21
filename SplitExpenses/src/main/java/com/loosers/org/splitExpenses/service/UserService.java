@@ -2,6 +2,7 @@ package com.loosers.org.splitExpenses.service;
 
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -12,6 +13,10 @@ import com.loosers.org.splitExpenses.model.User;
 public class UserService {
     List<User> users;
     HashMap<String, User> userMap = new HashMap<>();
+
+    UserService() {
+        users = new ArrayList<>();
+    }
 
     public void addUser(User user) {
         users.add(user);

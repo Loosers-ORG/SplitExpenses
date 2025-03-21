@@ -9,10 +9,13 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 public class Group {
+    @NonNull
     private String groupId;
     @NonNull
     private String name;
     private String description;
     private String createdBy;
-    private List<User> users;
+    private List<String> users;
+    private List<String> expenses;
+
 }

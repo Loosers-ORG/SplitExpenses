@@ -15,6 +15,7 @@ public class Expense {
     private String description;
     @NonNull
     private String paidBy;
+    private Double amount;
 
-    List<User> usersIncludedInExpense;
+    List<String> usersIncludedInExpense;
 }
