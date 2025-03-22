@@ -4,6 +4,7 @@ import io.micrometer.common.lang.NonNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @AllArgsConstructor
@@ -15,7 +16,7 @@ public class Expense {
     private String description;
     @NonNull
     private String paidBy;
-    private Double amount;
+    private BigDecimal amount;
 
     List<String> usersIncludedInExpense;
 }
