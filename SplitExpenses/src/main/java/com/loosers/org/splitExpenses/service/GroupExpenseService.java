@@ -58,10 +58,6 @@ public class GroupExpenseService {
         return expenseBalancer.initializeQueue(groupExpenseTable.getUserExpenseMap());
     }
 
-    public void clearExpenses(){
-        groupExpenseTable.getUserExpenseMap().clear();
-        expenseBalancer.settlementTransaction.clear();
-    }
 
     public Map<String, BigDecimal> getGroupExpenseTableUserExpenseMap() {
         return groupExpenseTable.getUserExpenseMap();

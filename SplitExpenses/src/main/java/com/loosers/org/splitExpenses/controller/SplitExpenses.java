@@ -6,7 +6,11 @@ import com.loosers.org.splitExpenses.service.GroupExpenseService;
 import com.loosers.org.splitExpenses.service.GroupService;
 import com.loosers.org.splitExpenses.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class SplitExpenses {
@@ -31,7 +35,14 @@ public class SplitExpenses {
     @PostMapping("/addUser")
     public String addUser(@RequestBody User user) {
         userService.addUser(user);
+
         return "User added successfully";
+    }
+
+    @GetMapping("/getUsers")
+    public ResponseEntity<List<User>> getUsers() {
+        List<User> users =  userService.getUsers();
+        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
     @PostMapping("/addExpense")

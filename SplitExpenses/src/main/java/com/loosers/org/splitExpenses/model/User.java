@@ -1,16 +1,27 @@
 package com.loosers.org.splitExpenses.model;
 
-import io.micrometer.common.lang.NonNull;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @AllArgsConstructor
+@NoArgsConstructor
 @Data
+@Entity
+@Table(name = "Users")
 public class User {
-    @NonNull
-    private String name;
-    @NonNull
+    @Id
     private String email;
+
+    @Column(nullable = false)
+    private String name;
+
+    @Column(unique = true, name = "phone_number")
     private String phoneNumber;
+
+    @ManyToMany(mappedBy = "users")
+    private List<Group> group;
 }

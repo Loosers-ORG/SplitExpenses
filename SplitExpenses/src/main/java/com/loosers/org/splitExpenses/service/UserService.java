@@ -1,5 +1,7 @@
 package com.loosers.org.splitExpenses.service;
 
+import com.loosers.org.splitExpenses.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -11,29 +13,19 @@ import com.loosers.org.splitExpenses.model.User;
 
 @Service
 public class UserService {
-    List<User> users;
-    HashMap<String, User> userMap = new HashMap<>();
-
-    UserService() {
-        users = new ArrayList<>();
-    }
+    @Autowired
+    UserRepository userRepository;
 
     public void addUser(User user) {
-        users.add(user);
-        userMap.put(user.getEmail(),user);
+        userRepository.save(user);
     }
 
     public List<User> getUsers() {
-        return users;
-    }
-
-    public HashMap<String, User> getUserMap() {
-        return userMap;
+        return userRepository.findAll();
     }
 
     public User getUserById(String userId){
-        Optional<User> foundUser = Optional.ofNullable(userMap.get(userId));
-
+        Optional<User> foundUser = userRepository.findById(userId);
         if (foundUser.isEmpty()) {
             throw new RuntimeException("User with ID " + userId + " not found.");
         }

@@ -1,22 +1,36 @@
 package com.loosers.org.splitExpenses.model;
 
-import io.micrometer.common.lang.NonNull;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Data
+@Entity
+@Table(name = "Expenses")
 public class Expense {
+    @Id
     private String expenseId;
-    @NonNull
+
+    @Column(nullable = false)
     private String name;
+
     private String description;
-    @NonNull
+
+    @Column(name = "paid_by",nullable = false)
     private String paidBy;
+
+    @Column(nullable = false)
     private BigDecimal amount;
+
+    @ManyToOne
+    @JoinColumn(name = "group_id") // Foreign key in Expense table
+    private Group group;
 
     List<String> usersIncludedInExpense;
 }

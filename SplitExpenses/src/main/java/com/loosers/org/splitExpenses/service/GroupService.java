@@ -3,55 +3,60 @@ package com.loosers.org.splitExpenses.service;
 import com.loosers.org.splitExpenses.model.Expense;
 import com.loosers.org.splitExpenses.model.Group;
 import com.loosers.org.splitExpenses.model.GroupExpenseTable;
+import com.loosers.org.splitExpenses.model.User;
+import com.loosers.org.splitExpenses.repository.GroupRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class GroupService {
 
-    List<Group> groups;
-
     @Autowired
     GroupExpenseService groupExpenseService;
 
-    GroupService() {
-        groups = new ArrayList<>();
-    }
+    @Autowired
+    UserService userService;
+
+    @Autowired
+    GroupRepository groupRepository;
+
     public void addGroup(Group group) {
-        group.setExpenses(new ArrayList<>());
-        groups.add(group);
-        for(String userId: group.getUsers())
-            groupExpenseService.addUser(userId);
+        groupRepository.save(group);
+        for(User user: group.getUsers())
+            groupExpenseService.addUser(user.getEmail());
     }
 
-    public List<Group> getGroups(String userId) {
-        return groups.stream().filter(g -> g.getUsers().contains(userId)).toList();
-    }
+//    public List<Group> getGroups(String userId) {
+//        return groups.stream().filter(g -> g.getUsers().contains(userId)).toList();
+//    }
 
-    public void addExpenseToGroup(String expenseId, String groupId) {
-        Group group = groups.stream().filter(g -> g.getGroupId().equals(groupId)).findFirst().orElse(null);
-        if (group == null) {
+    public void addExpenseToGroup(Expense expense, String groupId) {
+        Optional<Group> foundGroup = groupRepository.findById(groupId);
+        if (foundGroup.isEmpty()) {
             throw new RuntimeException("Group with ID " + groupId + " not found.");
         }
-        group.getExpenses().add(expenseId);
+        Group group = foundGroup.get();
+        group.getExpenses().add(expense);
     }
 
-    public List<String> getExpensesInGroup(String groupId) {
-        Group group = groups.stream().filter(g -> g.getGroupId().equals(groupId)).findFirst().orElse(null);
-        if (group == null) {
+    public List<Expense> getExpensesInGroup(String groupId) {
+        Optional<Group> foundGroup = groupRepository.findById(groupId);
+        if (foundGroup.isEmpty()) {
             throw new RuntimeException("Group with ID " + groupId + " not found.");
         }
+        Group group = foundGroup.get();
         return group.getExpenses();
     }
 
     public Group getGroupById(String groupId) {
-        Group group = groups.stream().filter(g -> g.getGroupId().equals(groupId)).findFirst().orElse(null);
-        if (group == null) {
+        Optional<Group> foundGroup = groupRepository.findById(groupId);
+        if (foundGroup.isEmpty()) {
             throw new RuntimeException("Group with ID " + groupId + " not found.");
         }
-        return group;
+        return foundGroup.get();
     }
 }
