@@ -46,8 +46,9 @@ public class SplitExpenses {
     }
 
     @PostMapping("/addExpense")
-    public String addExpense(@RequestBody Expense expense, @RequestParam String groupId) {
-        return expenseService.addExpenseToGroup(expense, groupId);
+    public ResponseEntity<List<SettlementTransaction>> addExpense(@RequestBody Expense expense, @RequestParam String groupId) {
+        List<SettlementTransaction> settlementTransactions = expenseService.addExpenseToGroup(expense,groupId);
+        return new ResponseEntity<>(settlementTransactions, HttpStatus.CREATED);
     }
 
     @PostMapping("/addGroup")

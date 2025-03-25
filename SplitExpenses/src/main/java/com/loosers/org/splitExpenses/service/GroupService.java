@@ -25,6 +25,8 @@ public class GroupService {
     GroupRepository groupRepository;
 
     public void addGroup(Group group) {
+        List<User> usersInGroup = userService.getUsersById(group.getUserIds());
+        group.setUsers(usersInGroup);
         groupRepository.save(group);
         for(User user: group.getUsers())
             groupExpenseService.addUser(user.getEmail());
@@ -35,20 +37,14 @@ public class GroupService {
 //    }
 
     public void addExpenseToGroup(Expense expense, String groupId) {
-        Optional<Group> foundGroup = groupRepository.findById(groupId);
-        if (foundGroup.isEmpty()) {
-            throw new RuntimeException("Group with ID " + groupId + " not found.");
-        }
-        Group group = foundGroup.get();
+        Group group = getGroupById(groupId);
+        expense.setGroup(group);
         group.getExpenses().add(expense);
+        groupRepository.save(group);
     }
 
     public List<Expense> getExpensesInGroup(String groupId) {
-        Optional<Group> foundGroup = groupRepository.findById(groupId);
-        if (foundGroup.isEmpty()) {
-            throw new RuntimeException("Group with ID " + groupId + " not found.");
-        }
-        Group group = foundGroup.get();
+        Group group = getGroupById(groupId);
         return group.getExpenses();
     }
 

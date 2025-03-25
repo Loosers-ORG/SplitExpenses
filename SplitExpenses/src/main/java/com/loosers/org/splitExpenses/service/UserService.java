@@ -32,4 +32,12 @@ public class UserService {
         return foundUser.get();
     }
 
+    public List<User> getUsersById(List<String> userIds) {
+        List<User> users = new ArrayList<>();
+        for(String userId: userIds) {
+            User user = getUserById(userId);
+            users.add(user);
+        }
+        return users;
+    }
 }

@@ -31,15 +31,12 @@ public class ExpenseService {
         expenseRepository.save(expense);
     }
 
-    public String addExpenseToGroup(Expense expense, String groupId) {
+    public List<SettlementTransaction> addExpenseToGroup(Expense expense, String groupId) {
+        List<User> usersInExpense = userService.getUsersById(expense.getUsersIncludedInExpense());
+        expense.setUsers(usersInExpense);
         groupService.addExpenseToGroup(expense, groupId);
         groupExpenseService.addExpense(expense);
-        return groupExpenseService.getSettlement().toString();
-    }
-
-    public void addUserInExpense(String expenseId, String userId) {
-        Expense expense = getExpenseById(expenseId);
-        expense.getUsersIncludedInExpense().add(userId);
+        return groupExpenseService.getSettlement();
     }
 
     public Expense getExpenseById(String expenseId) {

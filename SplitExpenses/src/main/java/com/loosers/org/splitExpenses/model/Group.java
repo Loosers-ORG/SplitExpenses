@@ -33,6 +33,9 @@ public class Group {
     )
     private List<User> users;
 
+    @Transient
+    private  List<String> userIds;
+
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Expense> expenses;
 }

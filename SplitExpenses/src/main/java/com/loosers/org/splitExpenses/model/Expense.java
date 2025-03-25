@@ -32,5 +32,14 @@ public class Expense {
     @JoinColumn(name = "group_id") // Foreign key in Expense table
     private Group group;
 
+    @ManyToMany
+    @JoinTable(
+            name = "expense_users",
+            joinColumns = @JoinColumn(name = "expense_id"),
+            inverseJoinColumns = @JoinColumn(name = "email")
+    )
+    private List<User> users;
+
+    @Transient
     List<String> usersIncludedInExpense;
 }

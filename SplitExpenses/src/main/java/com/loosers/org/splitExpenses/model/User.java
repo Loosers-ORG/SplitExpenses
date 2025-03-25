@@ -23,5 +23,8 @@ public class User {
     private String phoneNumber;
 
     @ManyToMany(mappedBy = "users")
-    private List<Group> group;
+    private List<Group> groups;
+
+    @ManyToMany(mappedBy = "users")
+    private List<Expense> expenses;
 }
