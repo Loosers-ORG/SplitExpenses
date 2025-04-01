@@ -35,8 +35,7 @@ public class ExpenseService {
         List<User> usersInExpense = userService.getUsersById(expense.getUsersIncludedInExpense());
         expense.setUsers(usersInExpense);
         groupService.addExpenseToGroup(expense, groupId);
-        groupExpenseService.addExpense(expense);
-        return groupExpenseService.getSettlement();
+        return groupExpenseService.addExpense(expense);
     }
 
     public Expense getExpenseById(String expenseId) {

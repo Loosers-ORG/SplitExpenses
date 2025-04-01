@@ -1,9 +1,10 @@
 package com.loosers.org.splitExpenses.service;
 
 import com.loosers.org.splitExpenses.ExpenseCalculator.ExpenseBalancer;
+import com.loosers.org.splitExpenses.model.Group;
 import com.loosers.org.splitExpenses.model.SettlementTransaction;
 import com.loosers.org.splitExpenses.model.Expense;
-import com.loosers.org.splitExpenses.model.GroupExpenseTable;
+import com.loosers.org.splitExpenses.model.UserOutstandingBalances;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,50 +17,58 @@ import java.util.Map;
 @Service
 public class GroupExpenseService {
 
-    GroupExpenseTable groupExpenseTable;
+    UserOutstandingBalances userOutstandingBalances;
 
     @Autowired
     ExpenseBalancer expenseBalancer;
 
-    GroupExpenseService() {
-        groupExpenseTable = new GroupExpenseTable();
-        groupExpenseTable.setUserExpenseMap(new HashMap<>());
-    }
+    @Autowired
+    GroupService groupService;
 
-    public void addUser(String userId) {
-        groupExpenseTable.getUserExpenseMap().put(userId, BigDecimal.ZERO);
-    }
+    @Autowired
+    GroupExpenseTableService groupExpenseTableService;
 
-    public void addExpense(Expense expense) {
+    public List<SettlementTransaction>  addExpense(Expense expense) {
         BigDecimal amount = expense.getAmount();
         String paidBy = expense.getPaidBy();
         List<String> usersIncludedInExpense = expense.getUsersIncludedInExpense();
-        Map<String, BigDecimal> groupExpenseTableUserExpenseMap = groupExpenseTable.getUserExpenseMap();
+        Group group = expense.getGroup();
+        List<UserOutstandingBalances> userOutstandingBalances = group.getUserOutstandingBalances();
 
-        groupExpenseTableUserExpenseMap.compute(paidBy, (k, existingAmount) ->
-                (existingAmount == null ? BigDecimal.ZERO : existingAmount).add(amount)
-        );
         BigDecimal amountPerUser = amount.divide(
                 BigDecimal.valueOf(usersIncludedInExpense.size()),
                 2,
                 RoundingMode.HALF_UP
         );
 
-        for (String user : usersIncludedInExpense) {
-            groupExpenseTableUserExpenseMap.compute(user, (k, userExpense) ->
-                    (userExpense == null ? BigDecimal.ZERO : userExpense).subtract(amountPerUser)
-            );
+        for(UserOutstandingBalances userOutstandingBalance : userOutstandingBalances) {
+            String userId = userOutstandingBalance.getUserId();
+            if (userId.equals(paidBy)) {
+                userOutstandingBalance.setOutStandingAmount(userOutstandingBalance.getOutStandingAmount().add(amount.subtract(amountPerUser)));
+            } else if (usersIncludedInExpense.contains(userId)) {
+                userOutstandingBalance.setOutStandingAmount(userOutstandingBalance.getOutStandingAmount().subtract(amountPerUser));
+            }
         }
+
+        groupExpenseTableService.updateGroupExpenseTable(userOutstandingBalances);
         System.out.println("Expense added to group expense table");
 
+        return getSettlement(userOutstandingBalances);
+
     }
 
-    public List<SettlementTransaction> getSettlement(){
-        return expenseBalancer.initializeQueue(groupExpenseTable.getUserExpenseMap());
+
+    public List<SettlementTransaction> getSettlement(List<UserOutstandingBalances> userOutstandingBalances) {
+        Map<String, BigDecimal> transactions = new HashMap<>();
+        for(UserOutstandingBalances userOutstandingBalance : userOutstandingBalances) {
+            transactions.put(userOutstandingBalance.getUserId(), userOutstandingBalance.getOutStandingAmount());
+        }
+        return expenseBalancer.initializeQueue(transactions);
     }
 
 
-    public Map<String, BigDecimal> getGroupExpenseTableUserExpenseMap() {
-        return groupExpenseTable.getUserExpenseMap();
+    public List<UserOutstandingBalances> getGroupExpenseTableUserExpenseMap(String groupId) {
+        Group group = groupService.getGroupById(groupId);
+        return group.getUserOutstandingBalances();
     }
 }

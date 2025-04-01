@@ -52,14 +52,14 @@ public class SplitExpenses {
     }
 
     @PostMapping("/addGroup")
-    public String addGroup(@RequestBody Group group) {
-        groupService.addGroup(group);
-        return "Group added successfully";
+    public ResponseEntity<?> addGroup(@RequestBody Group group) {
+         groupService.addGroup(group);
+         return new ResponseEntity<>("Group added successfully", HttpStatus.CREATED);
     }
 
     @GetMapping("/getExpenseMap")
-    public String getExpenseMap() {
-        return groupExpenseService.getGroupExpenseTableUserExpenseMap().toString();
+    public ResponseEntity<?> getExpenseMap(@RequestParam String groupId) {
+        return new ResponseEntity<>(groupExpenseService.getGroupExpenseTableUserExpenseMap(groupId), HttpStatus.OK);
     }
 
 }

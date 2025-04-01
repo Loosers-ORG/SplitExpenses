@@ -2,13 +2,11 @@ package com.loosers.org.splitExpenses.service;
 
 import com.loosers.org.splitExpenses.model.Expense;
 import com.loosers.org.splitExpenses.model.Group;
-import com.loosers.org.splitExpenses.model.GroupExpenseTable;
 import com.loosers.org.splitExpenses.model.User;
 import com.loosers.org.splitExpenses.repository.GroupRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,10 +14,10 @@ import java.util.Optional;
 public class GroupService {
 
     @Autowired
-    GroupExpenseService groupExpenseService;
+    UserService userService;
 
     @Autowired
-    UserService userService;
+    GroupExpenseTableService groupExpenseTableService;
 
     @Autowired
     GroupRepository groupRepository;
@@ -28,13 +26,8 @@ public class GroupService {
         List<User> usersInGroup = userService.getUsersById(group.getUserIds());
         group.setUsers(usersInGroup);
         groupRepository.save(group);
-        for(User user: group.getUsers())
-            groupExpenseService.addUser(user.getEmail());
+        groupExpenseTableService.createGroupExpenseTable(group);
     }
-
-//    public List<Group> getGroups(String userId) {
-//        return groups.stream().filter(g -> g.getUsers().contains(userId)).toList();
-//    }
 
     public void addExpenseToGroup(Expense expense, String groupId) {
         Group group = getGroupById(groupId);
