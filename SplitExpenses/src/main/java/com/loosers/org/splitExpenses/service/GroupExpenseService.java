@@ -10,9 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class GroupExpenseService {
@@ -20,10 +18,10 @@ public class GroupExpenseService {
     UserOutstandingBalances userOutstandingBalances;
 
     @Autowired
-    ExpenseBalancer expenseBalancer;
+    GroupService groupService;
 
     @Autowired
-    GroupService groupService;
+    ExpenseBalancer expenseBalancer;
 
     @Autowired
     GroupExpenseTableService groupExpenseTableService;
@@ -52,18 +50,7 @@ public class GroupExpenseService {
 
         groupExpenseTableService.updateGroupExpenseTable(userOutstandingBalances);
         System.out.println("Expense added to group expense table");
-
-        return getSettlement(userOutstandingBalances);
-
-    }
-
-
-    public List<SettlementTransaction> getSettlement(List<UserOutstandingBalances> userOutstandingBalances) {
-        Map<String, BigDecimal> transactions = new HashMap<>();
-        for(UserOutstandingBalances userOutstandingBalance : userOutstandingBalances) {
-            transactions.put(userOutstandingBalance.getUserId(), userOutstandingBalance.getOutStandingAmount());
-        }
-        return expenseBalancer.initializeQueue(transactions);
+        return expenseBalancer.simplifyExpenses(group.getGroupId(),userOutstandingBalances);
     }
 
 
