@@ -5,6 +5,7 @@ import com.loosers.org.splitExpenses.service.ExpenseService;
 import com.loosers.org.splitExpenses.service.GroupExpenseService;
 import com.loosers.org.splitExpenses.service.GroupService;
 import com.loosers.org.splitExpenses.service.UserService;
+import com.loosers.org.splitExpenses.utils.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,37 +28,61 @@ public class SplitExpenses {
     @Autowired
     GroupExpenseService groupExpenseService;
 
+    @Autowired
+    IdGenerator idGenerator;
+
     @GetMapping("/hello")
     public String hello() {
         return "Hello World";
     }
 
-    @PostMapping("/addUser")
+    @PostMapping("/user")
     public String addUser(@RequestBody User user) {
         userService.addUser(user);
 
         return "User added successfully";
     }
 
-    @GetMapping("/getUsers")
+    @GetMapping("/users")
     public ResponseEntity<List<User>> getUsers() {
         List<User> users =  userService.getUsers();
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    @PostMapping("/addExpense")
+    @PostMapping("/expense")
     public ResponseEntity<List<SettlementTransaction>> addExpense(@RequestBody Expense expense, @RequestParam String groupId) {
+        expense.setExpenseId(idGenerator.generteId(groupId, expense.getExpenseId()));
         List<SettlementTransaction> settlementTransactions = expenseService.addExpenseToGroup(expense,groupId);
         return new ResponseEntity<>(settlementTransactions, HttpStatus.CREATED);
     }
 
-    @PostMapping("/addGroup")
+    @PutMapping("/expense")
+    public ResponseEntity<?> updateExpense(@RequestBody Expense expense) {
+        try {
+            List<SettlementTransaction> settlementTransactions = expenseService.modifyExpense(expense);
+            return new ResponseEntity<>(settlementTransactions, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error updating expense: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/expense")
+    public ResponseEntity<?> DeleteExpense(@RequestParam String expenseId) {
+        try {
+            List<SettlementTransaction> settlementTransactions = expenseService.deleteExpense(expenseId);
+            return new ResponseEntity<>(settlementTransactions, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error deleting expense: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/group")
     public ResponseEntity<?> addGroup(@RequestBody Group group) {
          groupService.addGroup(group);
          return new ResponseEntity<>("Group added successfully", HttpStatus.CREATED);
     }
 
-    @GetMapping("/getExpenseMap")
+    @GetMapping("/expenses")
     public ResponseEntity<?> getExpenseMap(@RequestParam String groupId) {
         return new ResponseEntity<>(groupExpenseService.getGroupExpenseTableUserExpenseMap(groupId), HttpStatus.OK);
     }

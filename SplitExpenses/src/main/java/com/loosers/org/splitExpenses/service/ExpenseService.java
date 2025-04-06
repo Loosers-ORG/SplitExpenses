@@ -7,8 +7,6 @@ import com.loosers.org.splitExpenses.repository.ExpenseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,8 +24,7 @@ public class ExpenseService {
     @Autowired
     ExpenseRepository expenseRepository;
 
-
-    public void addExpense(Expense expense) {
+    public void updateExpense(Expense expense) {
         expenseRepository.save(expense);
     }
 
@@ -45,4 +42,23 @@ public class ExpenseService {
         }
         return foundExpense.get();
     }
+
+    public List<SettlementTransaction> modifyExpense(Expense expense){
+        Expense expenseInDb = getExpenseById(expense.getExpenseId());
+        groupExpenseService.revertExpense(expenseInDb, true);
+        return addExpenseToGroup(expense, expenseInDb.getGroup().getGroupId());
+    }
+
+    public List<SettlementTransaction> deleteExpense(String expenseId) {
+        Expense expenseInDb = getExpenseById(expenseId);
+
+        List<SettlementTransaction> settlementTransactionList = groupExpenseService.revertExpense(expenseInDb, false);
+        deleteExpenseFromDb(expenseId);
+        return settlementTransactionList;
+    }
+
+    private void deleteExpenseFromDb(String expenseId) {
+        expenseRepository.deleteById(expenseId);
+    }
+
 }

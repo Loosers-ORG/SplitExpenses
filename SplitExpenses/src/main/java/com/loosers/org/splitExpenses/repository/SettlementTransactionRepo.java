@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface SettlementTransactionRepo extends JpaRepository<SettlementTransaction, String> {
     List<SettlementTransaction> findAllByGroupId(String groupId);
+    void deleteAllByGroupId(String groupId);
 }

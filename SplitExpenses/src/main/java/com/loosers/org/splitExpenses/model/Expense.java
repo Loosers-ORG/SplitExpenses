@@ -22,11 +22,14 @@ public class Expense {
 
     private String description;
 
-    @Column(name = "paid_by",nullable = false)
+    @Column(name = "paid_by", nullable = false)
     private String paidBy;
 
     @Column(nullable = false)
     private BigDecimal amount;
+
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean isDeleted;
 
     @ManyToOne
     @JoinColumn(name = "group_id") // Foreign key in Expense table

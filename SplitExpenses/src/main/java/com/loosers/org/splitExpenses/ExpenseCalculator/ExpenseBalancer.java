@@ -22,13 +22,11 @@ class UserTransaction {
 public class ExpenseBalancer {
     @Autowired
     SettlementTransactionService settlementTransactionService;
-//    public List<SettlementTransaction> settlementTransaction;
-
     PriorityQueue<UserTransaction> receiversQueue = new PriorityQueue<>((a, b) -> b.amount.compareTo(a.amount));
     PriorityQueue<UserTransaction> sendersQueue = new PriorityQueue<>((a, b) -> b.amount.compareTo(a.amount));
 
     public List<SettlementTransaction> simplifyExpenses(String groupId, List<UserOutstandingBalances> userOutstandingBalances){
-//        settlementTransaction = new ArrayList<>();
+        settlementTransactionService.deleteSettlement(groupId);
         for(UserOutstandingBalances userOutstandingBalance: userOutstandingBalances){
             BigDecimal amount = userOutstandingBalance.getOutStandingAmount();
             if (amount.compareTo(BigDecimal.ZERO) < 0) {
@@ -49,7 +47,6 @@ public class ExpenseBalancer {
                 break;
             }
             BigDecimal paymentAmount = senderTop.amount.min(receiverTop.amount);
-//            settlementTransaction.add(new SettlementTransaction(groupId,senderTop.userId,receiverTop.userId,paymentAmount));
             settlementTransactionService.addSettlement(groupId,senderTop.userId,receiverTop.userId,paymentAmount);
             BigDecimal remainingAmount = receiverTop.amount.subtract(senderTop.amount);
             BigDecimal threshold = new BigDecimal("0.000000001");
