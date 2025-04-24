@@ -1,5 +1,6 @@
 package com.loosers.org.splitExpenses.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,6 +26,7 @@ public class Group {
     @Column(name = "created_by")
     private String createdBy;
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "group_users",

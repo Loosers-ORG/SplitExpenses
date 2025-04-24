@@ -1,5 +1,6 @@
 package com.loosers.org.splitExpenses.service;
 
+import com.loosers.org.splitExpenses.model.Group;
 import com.loosers.org.splitExpenses.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,5 +40,11 @@ public class UserService {
             users.add(user);
         }
         return users;
+    }
+
+    public List<Group> getGroupsByUserId(String userId) {
+        User user = getUserById(userId);
+        List<Group> groups = user.getGroups();
+        return groups;
     }
 }

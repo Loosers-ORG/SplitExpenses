@@ -48,4 +48,9 @@ public class GroupService {
         }
         return foundGroup.get();
     }
+
+    public List<User> getUsers(String groupId) {
+        Group group = getGroupById(groupId);
+        return group.getUsers();
+    }
 }

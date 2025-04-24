@@ -1,19 +1,23 @@
 package com.loosers.org.splitExpenses.controller;
 
+import com.loosers.org.splitExpenses.dao.ExpenseDao;
+import com.loosers.org.splitExpenses.dao.GroupDao;
+import com.loosers.org.splitExpenses.dao.UserDao;
 import com.loosers.org.splitExpenses.model.*;
-import com.loosers.org.splitExpenses.service.ExpenseService;
-import com.loosers.org.splitExpenses.service.GroupExpenseService;
-import com.loosers.org.splitExpenses.service.GroupService;
-import com.loosers.org.splitExpenses.service.UserService;
+import com.loosers.org.splitExpenses.service.*;
 import com.loosers.org.splitExpenses.utils.IdGenerator;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
+@CrossOrigin("http://localhost:5173/")
 public class SplitExpenses {
 
     @Autowired
@@ -21,6 +25,12 @@ public class SplitExpenses {
 
     @Autowired
     ExpenseService expenseService;
+
+    @Autowired
+    ModelMapper modelMapper;
+
+    @Autowired
+    SettlementTransactionService settlementTransactionService;;
 
     @Autowired
     GroupService groupService;
@@ -43,10 +53,23 @@ public class SplitExpenses {
         return "User added successfully";
     }
 
-    @GetMapping("/users")
-    public ResponseEntity<List<User>> getUsers() {
-        List<User> users =  userService.getUsers();
-        return new ResponseEntity<>(users, HttpStatus.OK);
+    @GetMapping("/group/users")
+    public ResponseEntity<List<UserDao>> getUsers(@RequestParam String groupId) {
+        List<User> users =  groupService.getUsers(groupId);
+        List<UserDao> userDaos = users.stream().map(user -> modelMapper.map(user, UserDao.class)).toList();
+        return new ResponseEntity<>(userDaos, HttpStatus.OK);
+    }
+
+
+    @GetMapping("/expense")
+    public ResponseEntity<List<ExpenseDao>> getExpenses(@RequestParam String groupId) {
+        List<Expense> expenses = groupService.getExpensesInGroup(groupId);
+        List<ExpenseDao> result = new ArrayList<>();
+        for (Expense expense : expenses) {
+            ExpenseDao expenseDao = modelMapper.map(expense, ExpenseDao.class);
+            result.add(expenseDao);
+        }
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @PostMapping("/expense")
@@ -76,10 +99,25 @@ public class SplitExpenses {
         }
     }
 
+    @GetMapping("/settlement")
+    public ResponseEntity<List<SettlementTransaction>> getSettlement(@RequestParam String groupId) {
+        List<SettlementTransaction> settlementTransactions = settlementTransactionService.getSettlementByGroup(groupId);
+        return new ResponseEntity<>(settlementTransactions, HttpStatus.OK);
+    }
+
     @PostMapping("/group")
     public ResponseEntity<?> addGroup(@RequestBody Group group) {
          groupService.addGroup(group);
          return new ResponseEntity<>("Group added successfully", HttpStatus.CREATED);
+    }
+
+    @GetMapping("/group")
+    public ResponseEntity<List<GroupDao>> getGroups(@RequestParam String userId) {
+        List<Group> groups = userService.getGroupsByUserId(userId);
+        List<GroupDao> result = groups.stream()
+                .map(group -> modelMapper.map(group, GroupDao.class))
+                .toList();
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("/expenses")
