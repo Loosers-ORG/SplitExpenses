@@ -3,6 +3,7 @@ package com.loosers.org.splitExpenses.ExpenseCalculator;
 import com.loosers.org.splitExpenses.model.SettlementTransaction;
 import com.loosers.org.splitExpenses.model.UserOutstandingBalances;
 import com.loosers.org.splitExpenses.service.SettlementTransactionService;
+import com.loosers.org.splitExpenses.utils.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,10 @@ class UserTransaction {
 public class ExpenseBalancer {
     @Autowired
     SettlementTransactionService settlementTransactionService;
+
+    @Autowired
+    IdGenerator idGenerator;
+
     PriorityQueue<UserTransaction> receiversQueue = new PriorityQueue<>((a, b) -> b.amount.compareTo(a.amount));
     PriorityQueue<UserTransaction> sendersQueue = new PriorityQueue<>((a, b) -> b.amount.compareTo(a.amount));
 
@@ -35,11 +40,12 @@ public class ExpenseBalancer {
                 receiversQueue.add(new UserTransaction(userOutstandingBalance.getUserId(), amount));
             }
         }
-        balanceExpenses(groupId);
-        return settlementTransactionService.getSettlementByGroup(groupId);
+        return balanceExpenses(groupId);
+//        return settlementTransactionService.getSettlementByGroup(groupId);
     }
 
-    private void balanceExpenses(String groupId){
+    private List<SettlementTransaction> balanceExpenses(String groupId){
+        List<SettlementTransaction> settlements = new ArrayList<>();
         while(!sendersQueue.isEmpty() && !receiversQueue.isEmpty()){
             UserTransaction senderTop = sendersQueue.poll();
             UserTransaction receiverTop = receiversQueue.poll();
@@ -47,7 +53,9 @@ public class ExpenseBalancer {
                 break;
             }
             BigDecimal paymentAmount = senderTop.amount.min(receiverTop.amount);
-            settlementTransactionService.addSettlement(groupId,senderTop.userId,receiverTop.userId,paymentAmount);
+//            settlementTransactionService.addSettlement(groupId,senderTop.userId,receiverTop.userId,paymentAmount);
+            String settlementId = idGenerator.generteId(groupId,senderTop.userId,receiverTop.userId);
+            settlements.add(new SettlementTransaction(settlementId,groupId,senderTop.userId,receiverTop.userId,paymentAmount));
             BigDecimal remainingAmount = receiverTop.amount.subtract(senderTop.amount);
             BigDecimal threshold = new BigDecimal("0.000000001");
 
@@ -60,6 +68,8 @@ public class ExpenseBalancer {
                 }
             }
         }
+        settlementTransactionService.saveAll(settlements);
+        return settlements;
     }
 }
 

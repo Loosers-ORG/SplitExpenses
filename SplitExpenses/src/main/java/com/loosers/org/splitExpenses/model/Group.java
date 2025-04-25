@@ -38,9 +38,9 @@ public class Group {
     @Transient
     private  List<String> userIds;
 
-    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "group", orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Expense> expenses;
 
-    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<UserOutstandingBalances> userOutstandingBalances;
 }

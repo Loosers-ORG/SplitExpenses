@@ -72,6 +72,12 @@ public class SplitExpenses {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    @GetMapping("/group/expense")
+    public ResponseEntity<List<Expense>> getGroupExpenses(@RequestParam String groupId) {
+        List<Expense> groupExpenses = expenseService.getExpensesByGroup(groupId);
+        return new ResponseEntity<>(groupExpenses, HttpStatus.OK);
+    }
+
     @PostMapping("/expense")
     public ResponseEntity<List<SettlementTransaction>> addExpense(@RequestBody Expense expense, @RequestParam String groupId) {
         expense.setExpenseId(idGenerator.generteId(groupId, expense.getExpenseId()));

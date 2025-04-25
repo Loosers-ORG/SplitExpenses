@@ -45,6 +45,7 @@ package com.loosers.org.splitExpenses.service;
             String paidBy = expense.getPaidBy();
             List<String> usersIncludedInExpense = expense.getUsersIncludedInExpense();
             Group group = expense.getGroup();
+//            Group group=groupService.getGroupById(expense.getGroup().getGroupId());
             List<UserOutstandingBalances> userOutstandingBalances = group.getUserOutstandingBalances();
 
             BigDecimal amountPerUser = calculateAmountPerUser(amount, usersIncludedInExpense.size());

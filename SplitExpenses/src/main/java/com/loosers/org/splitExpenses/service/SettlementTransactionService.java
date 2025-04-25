@@ -30,6 +30,10 @@ public class SettlementTransactionService {
 
     @Transactional
     public void deleteSettlement(String groupId) {
-        settlementTransactionRepo.deleteAllByGroupId(groupId);
+        settlementTransactionRepo.deleteByGroupId(groupId);
+    }
+
+    public void saveAll(List<SettlementTransaction> settlements) {
+        settlementTransactionRepo.saveAll(settlements);
     }
 }

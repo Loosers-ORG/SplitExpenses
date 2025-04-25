@@ -28,14 +28,14 @@ public class Expense {
     @Column(nullable = false)
     private BigDecimal amount;
 
-    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    @Column(nullable = false)
     private boolean isDeleted;
 
     @ManyToOne
     @JoinColumn(name = "group_id") // Foreign key in Expense table
     private Group group;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "expense_users",
             joinColumns = @JoinColumn(name = "expense_id"),
