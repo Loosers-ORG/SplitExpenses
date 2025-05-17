@@ -49,8 +49,14 @@ public class SplitExpenses {
     @PostMapping("/user")
     public String addUser(@RequestBody User user) {
         userService.addUser(user);
-
         return "User added successfully";
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<List<UserDao>> getUsers() {
+        List<User> users = userService.getUsers();
+        List<UserDao> userDaos = users.stream().map(user -> modelMapper.map(user, UserDao.class)).toList();
+        return new ResponseEntity<>(userDaos, HttpStatus.OK);
     }
 
     @GetMapping("/group/users")
