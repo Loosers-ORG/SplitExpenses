@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = {"https://splitexpenses-tqed.onrender.com", "http://localhost:5173/"})
+@CrossOrigin(origins = {"https://splitexpenses-1.onrender.com/", "http://localhost:5173/"})
 public class SplitExpenses {
 
     @Autowired
