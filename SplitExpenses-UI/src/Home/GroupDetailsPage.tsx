@@ -26,7 +26,7 @@ function GroupDetailsPage() {
     // Fetch users in the group
     const fetchUsers = async () => {
       try {
-        const response = await fetch(`http://localhost:8080/group/users?groupId=${groupId}`);
+        const response = await fetch(`https://splitexpenses-tqed.onrender.com/group/users?groupId=${groupId}`);
         if (response.ok) {
           const data = await response.json();
           setUsers(data); // Assuming `data` is an array of users
@@ -48,7 +48,7 @@ function GroupDetailsPage() {
 
   const fetchExpenses = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/expense?groupId=${groupId}`);
+      const response = await fetch(`https://splitexpenses-tqed.onrender.com/expense?groupId=${groupId}`);
       if (response.ok) {
         const data = await response.json();
         setExpenses(data);
@@ -62,7 +62,7 @@ function GroupDetailsPage() {
 
   const fetchTransactions = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/settlement?groupId=${groupId}`);
+      const response = await fetch(`https://splitexpenses-tqed.onrender.com/settlement?groupId=${groupId}`);
       if (response.ok) {
         const data = await response.json();
         const filteredTransactions = data.filter(
@@ -89,7 +89,7 @@ function GroupDetailsPage() {
     }
 
     try {
-      const response = await fetch(`http://localhost:8080/expense?groupId=${groupId}`, {
+      const response = await fetch(`https://splitexpenses-tqed.onrender.com/expense?groupId=${groupId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

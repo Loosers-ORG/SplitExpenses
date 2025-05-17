@@ -22,7 +22,7 @@ function Login() {
       name: decodedToken.name,
     };
 
-    fetch('http://localhost:8080/user', {
+    fetch('https://splitexpenses-tqed.onrender.com/user', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
