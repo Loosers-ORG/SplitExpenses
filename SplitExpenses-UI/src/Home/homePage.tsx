@@ -18,7 +18,7 @@ function HomePage() {
     // Fetch the list of groups for the user
     const fetchGroups = async () => {
       try {
-        const response = await fetch(`http://localhost:8080/group?userId=${logedInUser}`);
+        const response = await fetch(`https://splitexpenses-tqed.onrender.com/group?userId=${logedInUser}`);
         if (response.ok) {
           const data = await response.json();
           setGroups(data);
@@ -45,7 +45,7 @@ const handleCreateGroup = async () => {
   }
   try {
     const newGroupId =  Date.now(); // Generate a unique ID for the group
-    const response = await fetch('http://localhost:8080/group', {
+    const response = await fetch('https://splitexpenses-tqed.onrender.com/group', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -83,7 +83,7 @@ const handleCreateGroup = async () => {
 };
   const fetchUsers = async () => {
     try {
-      const response = await fetch('http://localhost:8080/users');
+      const response = await fetch('https://splitexpenses-tqed.onrender.com/users');
       if (response.ok) {
         const data = await response.json();
         setUsers(data);
