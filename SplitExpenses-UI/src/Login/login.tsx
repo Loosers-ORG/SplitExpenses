@@ -5,9 +5,8 @@ import styles from './login.module.css';
 
 function Login() {
   const [user, setUser] = useState(null); // State to store logged-in user info
-  const [isDarkMode, setIsDarkMode] = useState(false); // State to toggle dark mode
   const navigate = useNavigate(); // React Router's navigation hook
-
+  const isDarkMode = true; // Set dark mode to true by default
   const handleGoogleLoginSuccess = (credentialResponse) => {
     const decodedToken = JSON.parse(atob(credentialResponse.credential.split('.')[1]));
     setUser({
@@ -38,18 +37,12 @@ function Login() {
     console.error('Google Login Failed');
   };
 
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-  };
 
   return (
     <GoogleOAuthProvider clientId="998575087605-8kg6g4slrh5c53shqupfqcfmn60u0244.apps.googleusercontent.com">
       <div className={`${styles.container} ${isDarkMode ? styles.dark : ''}`}>
         {/* Dark Mode Toggle Button */}
-        <button className={styles.toggleButton} onClick={toggleDarkMode}>
-          {isDarkMode ? '🌙' : '☀️'}
-        </button>
-
+       
         {!user ? (
           <div className={styles.googleLoginContainer}>
             <h1>Login with Google</h1>
