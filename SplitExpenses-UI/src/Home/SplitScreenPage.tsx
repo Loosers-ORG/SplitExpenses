@@ -7,6 +7,7 @@ function SplitScreenPage() {
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState(null); // State to store the selected group
   const [users, setUsers] = useState([]); // List of all users
+  const [groupUsers, setGroupUsers] = useState([]); // List of group users
   const [expenses, setExpenses] = useState([]); // Expenses for the selected group
   const [transactions, setTransactions] = useState([]); // Transactions for the selected group
   const [newGroupName, setNewGroupName] = useState("");
@@ -60,7 +61,7 @@ function SplitScreenPage() {
       );
       if (response.ok) {
         const data = await response.json();
-        setUsers(data);
+        setGroupUsers(data);
       } else {
         console.error("Failed to fetch users");
       }
@@ -124,7 +125,7 @@ function SplitScreenPage() {
         const data = await response.json();
         const filteredTransactions = data.filter(
           (transaction) =>
-            transaction.sender === email || transaction.receiver === email
+            transaction.sender === logedInUser || transaction.receiver === logedInUser
         );
         setTransactions(filteredTransactions);
       } else {
@@ -150,6 +151,7 @@ function SplitScreenPage() {
         setExpenses((prevExpenses) =>
           prevExpenses.filter((expense) => expense.expenseId !== expenseId)
         );
+        fetchTransactions();
         toast.success("Expense deleted successfully!");
       } else {
         console.error("Failed to delete expense");
@@ -160,6 +162,7 @@ function SplitScreenPage() {
       toast.error("An error occurred. Please try again.");
     }
   };
+
 
   const handleAddExpense = async () => {
     if (!expenseName.trim() || expenseAmount === 0 || !expenseAmount === "") {
@@ -227,6 +230,7 @@ function SplitScreenPage() {
         return [...prev, userEmail];
       }
     });
+    console.log("selected users ", selectedUsers)
   };
 
   const handleCreateGroup = async () => {
@@ -242,7 +246,6 @@ function SplitScreenPage() {
 
     try {
       const newGroupId = Date.now(); // Generate a unique ID for the group
-      selectedUsers.push(logedInUser); // Include the logged-in user in the group
       const response = await fetch(
         "https://splitexpenses-tqed.onrender.com/group",
         {
@@ -331,9 +334,8 @@ function SplitScreenPage() {
               className={styles.groupItem}
               onClick={() => handleGroupClick(group)}
             >
-              <strong>{group.name}</strong>
-              <p>{group.description}</p>
-              <small>Created by: {group.createdBy}</small>
+              <div><strong>{group.name}</strong></div>
+              <div><small>{group.description}</small></div> 
             </li>
           ))}
         </ul>
@@ -350,7 +352,10 @@ function SplitScreenPage() {
             <div className={styles.header}>
               <h2>Group Details - {currGroupName}</h2>
               <button
-                onClick={() => setIsPopupOpenExpenses(true)}
+                onClick={() => {
+                  setIsPopupOpenExpenses(true)
+                  selectedUsers.push(logedInUser); // Include the logged-in user in the group
+                }}
                 className={styles.createGroupButton}
               >
                 Add Expense
@@ -361,17 +366,16 @@ function SplitScreenPage() {
               {transactions.map((transaction) => (
                 <li
                   key={transaction.settlementId}
-                  className={styles.transactionItem}
                 >
                   {transaction.sender === logedInUser ? (
                     <p>
-                      You owe <strong>{transaction.receiver}</strong> ₹
-                      {transaction.amount.toFixed(2)}
+                      You owe <strong>{transaction.receiver}</strong> 
+                      <small className={styles.sender}> ₹{transaction.amount.toFixed(2)}</small>
                     </p>
                   ) : (
                     <p>
-                      <strong>{transaction.sender}</strong> owes you ₹
-                      {transaction.amount.toFixed(2)}
+                      <strong>{transaction.sender}</strong> owes you 
+                      <small className={styles.receiver}> ₹{transaction.amount.toFixed(2)}</small>
                     </p>
                   )}
                 </li>
@@ -408,7 +412,9 @@ function SplitScreenPage() {
             </ul>
           </div>
         ) : (
-          <p>Select a group to view details</p>
+          <div className={styles.noExpenses}>
+            <p>Select a group to view details</p>
+          </div>
         )}
       </div>
       <ToastContainer
@@ -472,7 +478,10 @@ function SplitScreenPage() {
                 {isLoading ? "Saving..." : "Save"}
               </button>
               <button
-                onClick={() => setIsPopupOpen(false)} // Close the popup
+                onClick={() => {
+                  setIsPopupOpen(false)
+                  setSelectedUsers([])
+                }} // Close the popup
                 className={styles.cancelButton}
                 disabled={isLoading} // Disable cancel button while loading
               >
@@ -511,11 +520,12 @@ function SplitScreenPage() {
             />
             <h3>Select Users</h3>
             <ul className={styles.userList}>
-              {users.map((user) => (
+              {groupUsers.map((user) => (
                 <li key={user.email} className={styles.userItem}>
                   <label>
                     <input
                       type="checkbox"
+                      disabled={user.email === logedInUser}
                       checked={selectedUsers.includes(user.email)} // Bind to selectedUsers state
                       onChange={() =>
                         handleUserSelection(user.email, setSelectedUsers)
@@ -536,7 +546,11 @@ function SplitScreenPage() {
                 {isLoading ? "Saving..." : "Save"}
               </button>
               <button
-                onClick={() => setIsPopupOpenExpenses(false)} // Close the popup
+                onClick={() => {
+                  console.log("before calcel: ",selectedUsers);
+                  setIsPopupOpenExpenses(false)
+                  setSelectedUsers([])
+                }} // Close the popup
                 className={styles.cancelButton}
                 disabled={isLoading} // Disable cancel button while loading
               >
